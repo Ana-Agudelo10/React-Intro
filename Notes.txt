@@ -1,0 +1,1 @@
+Los eventos unicamente funcionan en Elementos, no en los componentes
