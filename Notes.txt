@@ -1,1 +1,56 @@
 Los eventos unicamente funcionan en Elementos, no en los componentes
+
+Debemos partir desde App.js que es el primer lugar en el cual enviamos una función encapsulada (el termino oficial es Render Props: “se refiere a una técnica para compartir código entre componentes en React utilizando una propiedad cuyo valor es una función ”) dentro de una prop a cada uno de los componentes TodoItem que se crean. [Render Props - documentación] (https://es.legacy.reactjs.org/docs/render-props.html)![1.jpg]
+
+//<TodoList/><TodoItem/>
+
+Como se aprecia estamos pasan esa función en onComplete y onDelete. Luego en nuestro componente TodoItem las recibimos y nuevamente las pasamos en una prop que volvemos a llamar onComplete y onDelete(El pro las llama onClick).
+
+//<TodoItem></TodoItem>
+Finalmente las recibiremos en nuestros componentes DeleteIcon y CompleteIcon respectivamente, y es ahí donde si crearemos ese evento que las ejecutará.
+
+CompleteIcon -> <TodoIcon/>
+En resumen:
+
+Shep 1:
+
+<TodoList>
+        {searchedTodos.map(todo => ( //SearchTodos (devuelve un array con los todos), renderizar los todos, apartir del estado derivado SearchTodos, filtrado con el otro estado de busqueda, derivado del primer array de todos
+          <TodoItem 
+            key = { todo.text } 
+            text = { todo.text }
+            completed = {todo.completed }
+            onComplete = { () => completeTodo(todo.text) }
+            onDelete = {() => deleteTodo(todo.text)}/>  //Los eventos en react no esperan de una vez la función ya ejecutada, si no que se necesita de una función a la que react pueda ponerle los parentesis unicamente cuando ocurra el evento o la iteracción por la que esperamos ejecutar esta función, para hacer esto, se encapsula las funciones en otras funciones. FunctionSecction, colocar una función que no se ha ejecutado evitando crachear y sucede cuando se llama el evento. Renderiza de nuevo por el cambio del estado
+        ))}
+
+      </TodoList>
+
+Shep 2:
+
+function TodoItem(props) {
+    return (
+      <li className="TodoItem">
+        <CompleteIcon
+          completed={props.completed}
+          onComplete={props.onComplete}/>
+
+        <p className={`TodoItem-p ${props.completed && "TodoItem-p--complete"}`}>{props.text}</p>
+        
+        <DeleteIcon
+          onDelete={props.onDelete}/>
+      </li>
+    );
+  }
+
+Step 3:
+
+function CompleteIcon({ completed, onComplete }) {
+    return (
+        <TodoIcon 
+            type = "check"
+            color = {completed ? 'green' : 'gray'}
+            onClick={onComplete}
+        />
+    );
+}
